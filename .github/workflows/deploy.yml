@@ -8,10 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,29 +25,9 @@ jobs:
         env:
           PUBLIC_PB_URL: ${{ secrets.PUBLIC_PB_URL }}
 
-      - name: Upload to Cloudflare Pages via API
+      - name: Deploy to Cloudflare Pages
         run: |
-          echo "=== Checking Pages API access ==="
-          curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" | head -c 200
-          
-          echo ""
-          echo "=== Creating Pages project ==="
-          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "name": "mi-protocolo",
-              "build_config": {
-                "build_command": "npm run build",
-                "destination_dir": "dist",
-                "root_dist": "/"
-              },
-              "source": {
-                "type": "github"
-              }
-            }' | head -c 500
+          npx wrangler pages deploy dist --project-name=mi-protocolo
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
