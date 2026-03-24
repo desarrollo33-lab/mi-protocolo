@@ -1,0 +1,179 @@
+---
+import AppLayout from '@layouts/AppLayout.astro';
+
+const PB_URL = import.meta.env.PUBLIC_PB_URL || 'http://64.176.16.231:8090';
+
+// Get auth from localStorage via inline script vars
+// For static build, we use client-side JS for auth
+---
+
+<AppLayout title="Mi Progreso">
+  <div class="max-w-md mx-auto px-4 py-6">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Mi Progreso</h1>
+      <p class="text-sm text-gray-500 mt-1">Tu adherencia al protocolo</p>
+    </div>
+
+    <!-- Overall progress ring -->
+    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-5">
+      <div class="flex items-center gap-6">
+        <div class="relative">
+          <svg class="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#E5E7EB" stroke-width="10"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#2E7D32" stroke-width="10"
+              stroke-dasharray="264" stroke-dashoffset="198"
+              stroke-linecap="round" id="progress-ring"/>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-xl font-bold text-gray-900" id="progress-pct">25%</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-gray-800">Nivel Raíces</p>
+          <p class="text-xs text-gray-500 mt-1">Completa todos los capítulos<br/>de esta capa para avanzar.</p>
+          <p class="text-xs text-forest mt-2 font-medium">3 de 12 lecciones</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily check-in -->
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-800">Hoy</h2>
+        <span class="text-xs text-gray-400" id="today-date"></span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        {[
+          { id: 'nutrition', label: 'Nutrición', icon: '🥗' },
+          { id: 'exercise', label: 'Ejercicio', icon: '🏃' },
+          { id: 'stress', label: 'Manejo del estrés', icon: '🧘' },
+          { id: 'sleep', label: 'Sueño', icon: '😴' }
+        ].map(item => (
+          <label
+            class="checkin-item flex items-center gap-2 p-3 rounded-xl border border-gray-100 hover:border-forest cursor-pointer transition-all bg-cream"
+            data-id={item.id}
+          >
+            <input type="checkbox" class="sr-only" id={`checkin-${item.id}`} />
+            <span class="text-lg">{item.icon}</span>
+            <span class="text-xs font-medium text-gray-700">{item.label}</span>
+            <span class="ml-auto check-indicator text-sm">○</span>
+          </label>
+        ))}
+      </div>
+
+      <button
+        id="save-checkin"
+        class="mt-4 w-full bg-forest hover:bg-forest-dark text-white font-semibold py-2.5 px-4 rounded-xl transition-colors text-sm"
+      >
+        Guardar check-in
+      </button>
+    </div>
+
+    <!-- Streak -->
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-5">
+      <div class="flex items-center gap-4">
+        <span class="text-3xl">🔥</span>
+        <div>
+          <p class="text-2xl font-bold text-gray-900">0</p>
+          <p class="text-xs text-gray-500">días consecutivos</p>
+        </div>
+        <div class="ml-auto text-right">
+          <p class="text-xs text-gray-500">Mejor racha</p>
+          <p class="text-sm font-semibold text-gray-700">0 días</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer progress -->
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-5">
+      <h2 class="text-sm font-semibold text-gray-800 mb-4">Progreso por capa</h2>
+      <div class="space-y-4">
+        {[
+          { name: 'Raíces', icon: '🌱', color: 'bg-forest', pct: 25, count: '3/12' },
+          { name: 'Territorio', icon: '🌿', color: 'bg-amber-500', pct: 0, count: '0/8', locked: true },
+          { name: 'Yagán', icon: '🏔️', color: 'bg-purple-500', pct: 0, count: '0/4', locked: true }
+        ].map(layer => (
+          <div class={`${layer.locked ? 'opacity-50' : ''}`}>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm text-gray-700">{layer.icon} {layer.name}</span>
+              <span class="text-xs text-gray-400">{layer.count}</span>
+            </div>
+            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div class={`h-full ${layer.color} rounded-full transition-all`} style={`width: ${layer.pct}%`}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  // Set today's date
+  const el = document.getElementById('today-date');
+  if (el) {
+    el.textContent = new Date().toLocaleDateString('es-CL', {
+      weekday: 'long', day: 'numeric', month: 'short'
+    });
+  }
+
+  // Checkin toggle
+  document.querySelectorAll('.checkin-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const checkbox = item.querySelector('input') as HTMLInputElement;
+      checkbox.checked = !checkbox.checked;
+      item.classList.toggle('border-forest', checkbox.checked);
+      item.classList.toggle('bg-forest/5', checkbox.checked);
+      const indicator = item.querySelector('.check-indicator');
+      if (indicator) {
+        indicator.textContent = checkbox.checked ? '✓' : '○';
+        indicator.className = `ml-auto check-indicator text-sm ${checkbox.checked ? 'text-forest' : 'text-gray-400'}`;
+      }
+    });
+  });
+
+  // Save checkin
+  document.getElementById('save-checkin')?.addEventListener('click', async () => {
+    const checks = ['nutrition', 'exercise', 'stress', 'sleep'];
+    const done: Record<string, boolean> = {};
+    checks.forEach(id => {
+      const cb = document.getElementById(`checkin-${id}`) as HTMLInputElement;
+      done[id] = cb?.checked || false;
+    });
+    const total = Object.values(done).filter(Boolean).length;
+    const adherence = Math.round((total / 4) * 100);
+
+    const authData = localStorage.getItem('pb_auth');
+    if (!authData) {
+      alert('Por favor inicia sesión para guardar tu progreso.');
+      return;
+    }
+    const { token, record } = JSON.parse(authData);
+
+    try {
+      await fetch('http://64.176.16.231:8090/api/collections/daily_checkins/records', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user: record.id,
+          date: new Date().toISOString().split('T')[0],
+          nutrition_done: done.nutrition,
+          exercise_done: done.exercise,
+          stress_done: done.stress,
+          sleep_done: done.sleep,
+          overall_adherence: adherence
+        })
+      });
+      const btn = document.getElementById('save-checkin')!;
+      btn.textContent = '✓ Guardado';
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = 'Guardar check-in'; btn.disabled = false; }, 2000);
+    } catch {
+      alert('Error al guardar. Intenta de nuevo.');
+    }
+  });
+</script>

@@ -1,0 +1,61 @@
+---
+import AppLayout from '@layouts/AppLayout.astro';
+---
+
+<AppLayout title="Ajustes">
+  <div class="max-w-md mx-auto px-4 py-6">
+    <div class="mb-6">
+      <a href="/app/perfil" class="text-sm text-gray-400 hover:text-forest mb-2 inline-flex items-center gap-1">
+        ← Volver
+      </a>
+      <h1 class="text-2xl font-bold text-gray-900">Ajustes</h1>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Notifications -->
+      <div class="bg-white rounded-xl p-4 border border-gray-100">
+        <h2 class="text-sm font-semibold text-gray-800 mb-3">Notificaciones</h2>
+        <label class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Recordatorios diarios</span>
+          <input type="checkbox" id="notif-daily" class="sr-only peer" />
+          <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-forest cursor-pointer relative transition-colors"
+               onclick="this.previousElementSibling.checked = !this.previousElementSibling.checked; this.classList.toggle('bg-forest', this.previousElementSibling.checked); this.classList.toggle('bg-gray-200', !this.previousElementSibling.checked);">
+            <div class="w-5 h-5 bg-white rounded-full shadow absolute top-0.5 left-0.5 transition-transform peer-checked:translate-x-5"></div>
+          </div>
+        </label>
+        <label class="flex items-center justify-between mt-3">
+          <span class="text-sm text-gray-600">Recordatorios de capítulos</span>
+          <input type="checkbox" id="notif-chapters" class="sr-only peer" />
+          <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-forest cursor-pointer relative transition-colors"
+               onclick="this.previousElementSibling.checked = !this.previousElementSibling.checked; this.classList.toggle('bg-forest', this.previousElementSibling.checked); this.classList.toggle('bg-gray-200', !this.previousElementSibling.checked);">
+            <div class="w-5 h-5 bg-white rounded-full shadow absolute top-0.5 left-0.5 transition-transform peer-checked:translate-x-5"></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- App info -->
+      <div class="bg-white rounded-xl p-4 border border-gray-100">
+        <h2 class="text-sm font-semibold text-gray-800 mb-3">Acerca de la app</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Versión</span>
+            <span class="text-gray-700">1.0.0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Basado en</span>
+            <span class="text-gray-700">Salud Evolutiva — Dr. Joaquín Ipinza</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal -->
+      <div class="bg-white rounded-xl p-4 border border-gray-100">
+        <h2 class="text-sm font-semibold text-gray-800 mb-3">Legal</h2>
+        <div class="space-y-2">
+          <a href="#" class="block text-sm text-gray-600 hover:text-forest">Términos y condiciones</a>
+          <a href="#" class="block text-sm text-gray-600 hover:text-forest">Política de privacidad</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</AppLayout>

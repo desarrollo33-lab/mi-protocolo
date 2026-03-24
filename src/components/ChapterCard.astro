@@ -1,0 +1,37 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  layer: number;
+  completed?: boolean;
+  locked?: boolean;
+}
+
+const { id, title, description, layer, completed = false, locked = false } = Astro.props;
+---
+
+<article
+  class:list={[
+    'rounded-xl p-4 border transition-all',
+    locked
+      ? 'bg-gray-100 border-gray-200 opacity-60'
+      : completed
+        ? 'bg-forest-light/10 border-forest'
+        : 'bg-white border-gray-200 hover:border-forest'
+  ]}
+>
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-forest text-cream">
+          Capa {layer}
+        </span>
+        {completed && <span class="text-xs">✓</span>}
+        {locked && <span class="text-xs">🔒</span>}
+      </div>
+      <h3 class="font-semibold text-gray-900">{title}</h3>
+      <p class="text-sm text-gray-600 mt-1">{description}</p>
+    </div>
+  </div>
+</article>

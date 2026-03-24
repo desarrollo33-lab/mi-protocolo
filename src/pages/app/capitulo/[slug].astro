@@ -1,0 +1,204 @@
+---
+export async function getStaticPaths() {
+  const PB_URL = import.meta.env.PUBLIC_PB_URL || 'http://64.176.16.231:8090';
+  let chapters: any[] = [];
+
+  try {
+    const res = await fetch(`${PB_URL}/api/collections/chapters/records?perPage=50&sort=orden`);
+    if (res.ok) {
+      const data = await res.json();
+      chapters = data.items || [];
+    }
+  } catch (e) {
+    // Return empty paths on error
+  }
+
+  return chapters.map((chapter: any) => ({
+    params: { slug: chapter.slug },
+    props: { chapter }
+  }));
+}
+
+const { chapter } = Astro.props;
+const { title, capa, seccion, resumen, content_md } = chapter;
+
+// Determine if this chapter is locked
+const isLocked = capa !== 'raices';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2E7D32" />
+    <title>{title} | Mi Protocolo</title>
+    <style>
+      .prose {
+        @apply text-gray-700 leading-relaxed;
+      }
+      .prose p {
+        @apply mb-4;
+      }
+      .prose h2 {
+        @apply text-xl font-bold text-gray-900 mt-6 mb-3;
+      }
+      .prose h3 {
+        @apply text-lg font-semibold text-gray-800 mt-4 mb-2;
+      }
+      .prose strong {
+        @apply font-semibold text-gray-900;
+      }
+      .prose em {
+        @apply italic;
+      }
+      .prose ul {
+        @apply list-disc pl-5 mb-4 space-y-1;
+      }
+      .prose ol {
+        @apply list-decimal pl-5 mb-4 space-y-1;
+      }
+      .prose blockquote {
+        @apply border-l-4 border-forest pl-4 italic text-gray-600 my-4;
+      }
+      .prose hr {
+        @apply my-6 border-gray-200;
+      }
+      .prose .page-break {
+        @apply hidden;
+      }
+    </style>
+  </head>
+  <body class="bg-cream text-gray-900 min-h-screen">
+    <!-- Header -->
+    <header class="bg-forest text-cream px-4 py-3 sticky top-0 z-40 shadow-sm">
+      <div class="max-w-md mx-auto flex items-center gap-3">
+        <a href="/app/biblioteca" class="text-cream/80 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-cream/70 truncate">{seccion?.replace('_', ' ')}</p>
+          <h1 class="text-sm font-semibold truncate">{title}</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class={`text-xs px-2 py-0.5 rounded-full ${capa === 'raices' ? 'bg-forest/30' : 'bg-amber-400/30 text-amber-100'}`}>
+            {capa}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    {isLocked ? (
+      <!-- Locked overlay -->
+      <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="text-center max-w-sm">
+          <div class="text-5xl mb-4">🔒</div>
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Contenido bloqueado</h2>
+          <p class="text-sm text-gray-500 mb-6">
+            Este capítulo pertenece a la Capa <strong>{capa}</strong>.
+            Completa los capítulos gratuitos y alcanza el 70% de adherencia para desbloquearlo.
+          </p>
+          <a
+            href="/app/progreso"
+            class="inline-block bg-forest hover:bg-forest-dark text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+          >
+            Ver mi progreso
+          </a>
+          <div class="mt-4">
+            <a href="/app/biblioteca" class="text-xs text-gray-400 hover:text-forest">
+              ← Volver a la biblioteca
+            </a>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <!-- Chapter content -->
+      <article class="max-w-md mx-auto px-4 py-6 pb-24">
+        <div class="mb-4">
+          <span class="text-xs text-forest font-medium uppercase tracking-wide">
+            {seccion?.replace('_', ' ')}
+          </span>
+          <h1 class="text-2xl font-bold text-gray-900 mt-1 leading-tight">
+            {title}
+          </h1>
+          {resumen && (
+            <p class="text-sm text-gray-500 mt-2 italic">
+              {resumen?.substring(0, 200)}...
+            </p>
+          )}
+          <div class="h-px bg-gray-200 mt-4"></div>
+        </div>
+
+        <div class="prose" id="chapter-content">
+          <div set:html={(content_md || '').replace(/\n/g, '<br/>')} />
+        </div>
+
+        <!-- Next chapter nav -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <a
+            href="/app/biblioteca"
+            class="block text-center text-sm text-forest font-medium hover:underline"
+          >
+            ← Volver a la biblioteca
+          </a>
+        </div>
+      </article>
+    )}
+
+    <!-- Bottom nav -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-cream border-t border-gray-200 px-4 py-2 z-50">
+      <ul class="flex justify-around items-center max-w-lg mx-auto">
+        {[
+          { href: '/app/biblioteca', label: 'Biblioteca', icon: '📖' },
+          { href: '/app/progreso', label: 'Progreso', icon: '📊' },
+          { href: '/app/perfil', label: 'Perfil', icon: '👤' }
+        ].map(item => (
+          <li>
+            <a href={item.href} class="flex flex-col items-center gap-0.5 text-xs text-gray-500 hover:text-forest transition-colors py-1">
+              <span class="text-base">{item.icon}</span>
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <script>
+      // Track reading progress
+      const chapter = { title: Astro.props.chapter.title, slug: Astro.props.chapter.slug };
+      let scrolled = false;
+
+      window.addEventListener('scroll', () => {
+        if (scrolled) return;
+        const scrollPct = Math.round(
+          (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+        );
+        if (scrollPct > 30) {
+          scrolled = true;
+          const auth = localStorage.getItem('pb_auth');
+          if (!auth) return;
+          try {
+            const { token, record } = JSON.parse(auth);
+            // Fire-and-forget progress update
+            fetch('http://64.176.16.231:8090/api/collections/user_progress/records', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                user: record.id,
+                chapter: chapter.slug,
+                progress_percent: Math.min(scrollPct, 100),
+                last_read_at: new Date().toISOString(),
+                completed: scrollPct >= 90
+              })
+            });
+          } catch {}
+        }
+      }, { passive: true });
+    </script>
+  </body>
+</html>

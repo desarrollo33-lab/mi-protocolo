@@ -1,0 +1,25 @@
+---
+const navItems = [
+  { href: '/app/biblioteca', label: 'Biblioteca', icon: 'book' },
+  { href: '/app/progreso', label: 'Progreso', icon: 'chart' },
+  { href: '/app/perfil', label: 'Perfil', icon: 'user' }
+];
+---
+
+<nav class="fixed bottom-0 left-0 right-0 bg-cream border-t border-gray-200 px-4 py-2 z-50">
+  <ul class="flex justify-around items-center max-w-md mx-auto">
+    {navItems.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class="flex flex-col items-center gap-0.5 text-xs text-gray-500 hover:text-forest transition-colors py-1"
+        >
+          <span class="text-lg">
+            {item.icon === 'book' ? '📖' : item.icon === 'chart' ? '📊' : '👤'}
+          </span>
+          <span>{item.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

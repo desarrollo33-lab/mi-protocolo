@@ -1,0 +1,135 @@
+---
+// Landing / Onboarding — select health profile
+const healthProfiles = [
+  { id: 'periodontitis', label: 'Periodontitis', icon: '🦷', desc: 'Enfermedad de encías' },
+  { id: 'diabetes', label: 'Diabetes', icon: '🩸', desc: 'Control metabólico' },
+  { id: 'amalgamas', label: 'Amalgamas', icon: '🪨', desc: 'Mercurio dental' },
+  { id: 'madre', label: 'Madre', icon: '🤱', desc: 'Salud maternal' },
+  { id: 'preventivo', label: 'Preventivo', icon: '🛡️', desc: 'Prevención general' },
+  { id: 'general', label: 'General', icon: '🌿', desc: 'Bienestar integral' }
+];
+
+const PB_URL = import.meta.env.PUBLIC_PB_URL || 'http://64.176.16.231:8090';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2E7D32" />
+    <title>Mi Protocolo | Salud Evolutiva</title>
+  </head>
+  <body class="bg-cream text-gray-900 min-h-screen">
+    <!-- Hero -->
+    <div class="bg-forest text-cream px-6 pt-12 pb-16 rounded-b-[2.5rem]">
+      <div class="max-w-md mx-auto">
+        <p class="text-xs font-medium tracking-widest uppercase mb-3 opacity-70">Libro del Dr. Joaquín Ipinza</p>
+        <h1 class="text-3xl font-bold leading-tight mb-2">Mi Protocolo</h1>
+        <p class="text-lg opacity-90 leading-relaxed">
+          Tu guía práctica de salud evolutiva basada en evidencia.
+        </p>
+        <div class="mt-4 flex gap-2 flex-wrap">
+          <span class="text-xs bg-white/20 px-2 py-1 rounded-full">📅 12 capítulos</span>
+          <span class="text-xs bg-white/20 px-2 py-1 rounded-full">🌿 4 soportes</span>
+          <span class="text-xs bg-white/20 px-2 py-1 rounded-full">🔒 Capas progresivas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile selector -->
+    <div class="max-w-md mx-auto px-4 -mt-8">
+      <div class="bg-white rounded-2xl shadow-lg border border-sand p-5">
+        <h2 class="text-base font-semibold text-gray-800 mb-1">
+          ¿Qué te trae aquí?
+        </h2>
+        <p class="text-xs text-gray-500 mb-4">
+          Selecciona tu perfil para personalizar tu experiencia
+        </p>
+
+        <div class="grid grid-cols-2 gap-3">
+          {healthProfiles.map((profile) => (
+            <button
+              type="button"
+              data-profile={profile.id}
+              class="profile-btn text-left p-3 rounded-xl border-2 border-gray-100 hover:border-forest transition-all bg-cream hover:bg-forest/5"
+            >
+              <span class="text-2xl block mb-1">{profile.icon}</span>
+              <span class="text-sm font-semibold text-gray-800 block">{profile.label}</span>
+              <span class="text-xs text-gray-500">{profile.desc}</span>
+            </button>
+          ))}
+        </div>
+
+        <div class="mt-5">
+          <a
+            href="/app/biblioteca"
+            id="start-btn"
+            class="hidden w-full block text-center bg-forest hover:bg-forest-dark text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+          >
+            Comenzar →
+          </a>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-gray-100 text-center">
+          <a href="/app" class="text-xs text-gray-400 hover:text-forest transition-colors">
+            Ya tengo cuenta →
+          </a>
+        </div>
+      </div>
+
+      <!-- Free chapters preview -->
+      <div class="mt-6 mb-8">
+        <h3 class="text-sm font-semibold text-gray-700 mb-3">
+          📖 Contenido gratuito de apertura
+        </h3>
+        <div class="space-y-2">
+          <a href="/app/capitulo/palabras-del-autor" class="flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-100 hover:border-forest transition-colors">
+            <span class="text-lg">🌱</span>
+            <div>
+              <p class="text-sm font-medium text-gray-800">Palabras del autor</p>
+              <p class="text-xs text-gray-400">Volver al origen</p>
+            </div>
+            <span class="ml-auto text-xs bg-forest/10 text-forest px-2 py-0.5 rounded-full">Gratis</span>
+          </a>
+          <a href="/app/capitulo/capitulo-i-evolucion-cultural" class="flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-100 hover:border-forest transition-colors">
+            <span class="text-lg">🧬</span>
+            <div>
+              <p class="text-sm font-medium text-gray-800">Capítulo I</p>
+              <p class="text-xs text-gray-400">Evolución cultural vs. natural</p>
+            </div>
+            <span class="ml-auto text-xs bg-forest/10 text-forest px-2 py-0.5 rounded-full">Gratis</span>
+          </a>
+          <a href="/app/capitulo/capitulo-ii-enfermedades-orales" class="flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-100 hover:border-forest transition-colors">
+            <span class="text-lg">🦷</span>
+            <div>
+              <p class="text-sm font-medium text-gray-800">Capítulo II</p>
+              <p class="text-xs text-gray-400">Enfermedades de la civilización</p>
+            </div>
+            <span class="ml-auto text-xs bg-forest/10 text-forest px-2 py-0.5 rounded-full">Gratis</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const buttons = document.querySelectorAll('.profile-btn');
+      const startBtn = document.getElementById('start-btn');
+      let selectedProfile = null;
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          buttons.forEach(b => {
+            b.classList.remove('border-forest', 'bg-forest/5', 'ring-2', 'ring-forest');
+          });
+          btn.classList.add('border-forest', 'bg-forest/5', 'ring-2', 'ring-forest');
+          selectedProfile = btn.getAttribute('data-profile');
+          localStorage.setItem('health_profile', selectedProfile);
+          if (startBtn) {
+            startBtn.classList.remove('hidden');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

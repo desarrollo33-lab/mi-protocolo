@@ -1,0 +1,22 @@
+---
+interface Props {
+  currentLayer: number;
+  requiredLayer: number;
+  message?: string;
+}
+
+const { currentLayer, requiredLayer, message } = Astro.props;
+const isLocked = currentLayer < requiredLayer;
+---
+
+{isLocked ? (
+  <div class="bg-gray-100 rounded-xl p-6 text-center border border-gray-200">
+    <div class="text-4xl mb-3">🔒</div>
+    <h3 class="font-semibold text-gray-700 mb-2">Contenido Bloqueado</h3>
+    <p class="text-sm text-gray-500">
+      {message || `Completa la Capa ${requiredLayer} para desbloquear este contenido.`}
+    </p>
+  </div>
+) : (
+  <slot />
+)}
