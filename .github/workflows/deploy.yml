@@ -21,11 +21,21 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Show directory structure
+        run: |
+          pwd
+          ls -la
+          ls -la frontend/ 2>/dev/null || echo "No frontend dir"
+
       - name: Install dependencies
-        run: cd frontend && npm ci
+        run: |
+          cd frontend
+          npm install --legacy-peer-deps
 
       - name: Build
-        run: cd frontend && npm run build
+        run: |
+          cd frontend
+          npm run build
         env:
           PUBLIC_PB_URL: ${{ secrets.PUBLIC_PB_URL }}
 
