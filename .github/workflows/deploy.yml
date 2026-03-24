@@ -16,11 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Node v3
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'
-          cache: false
+          node-version: '18'
 
       - name: Install dependencies
         run: cd frontend && npm ci
