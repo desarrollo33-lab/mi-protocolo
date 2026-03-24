@@ -29,10 +29,14 @@ jobs:
         env:
           PUBLIC_PB_URL: ${{ secrets.PUBLIC_PB_URL }}
 
-      - name: Deploy with Wrangler
+      - name: Deploy with Wrangler (verbose)
         run: |
-          npx wrangler pages project create mi-protocolo --production-branch=main 2>&1 || true
-          npx wrangler pages deploy dist --project-name=mi-protocolo --branch=main
+          echo "=== wrangler version ==="
+          npx wrangler@3 pages --version 2>&1 || true
+          echo "=== trying create ==="
+          npx wrangler@3 pages project create mi-protocolo --production-branch=main 2>&1 || true
+          echo "=== trying deploy ==="
+          npx wrangler@3 pages deploy dist --project-name=mi-protocolo --branch=main 2>&1
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
