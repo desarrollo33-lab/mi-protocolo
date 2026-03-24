@@ -21,21 +21,21 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Show directory structure
+      - name: Debug paths
         run: |
+          echo "=== repo root ==="
           pwd
           ls -la
-          ls -la frontend/ 2>/dev/null || echo "No frontend dir"
+          echo "=== checking for package.json ==="
+          cat package.json | head -5
+          echo "=== node version ==="
+          node --version
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm install --legacy-peer-deps
+        run: npm install
 
       - name: Build
-        run: |
-          cd frontend
-          npm run build
+        run: npm run build
         env:
           PUBLIC_PB_URL: ${{ secrets.PUBLIC_PB_URL }}
 
@@ -45,5 +45,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: mi-protocolo
-          directory: frontend/dist
+          directory: dist
           wranglerVersion: '3'
